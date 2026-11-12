@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Composiciones Visuales — Instalación Táctil</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Estilos táctiles puros para pantallas interactivas / tótem / iPad */
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      overscroll-behavior: none;
+    }
+
+    .font-mono-tech {
+      font-family: 'Space Mono', monospace;
+    }
+
+    .font-display {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+
+    /* Manijas de transformación gráficas estilo Illustrator */
+    .handle-dot {
+      width: 9px;
+      height: 9px;
+      background: #ffffff;
+      border: 1.5px solid #000000;
+      position: absolute;
+      pointer-events: none;
+      z-index: 30;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    }
+
+    /* Bloques con revelación fluida */
+    .reveal-block {
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Ripple táctil visual para feedback inmediato al tocar la pantalla */
+    .touch-ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0);
+      animation: ripple 0.6s linear;
+      pointer-events: none;
+      z-index: 50;
+    }
+
+    @keyframes ripple {
+      to {
+        transform: scale(3.5);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#09090b] text-[#fafafa] min-h-screen w-screen flex flex-col justify-between overflow-x-hidden selection:bg-rose-600">
+
+  <!-- BARRA SUPERIOR SUTIL / MINIMALISTA -->
+  <header class="w-full px-5 py-3.5 flex items-center justify-between border-b border-neutral-900 bg-[#09090b]/90 backdrop-blur z-40">
+    <div class="flex items-center gap-3">
+      <div class="w-7 h-7 rounded bg-white text-black font-mono-tech text-xs flex items-center justify-center font-bold">
+        01
+      </div>
+      <div>
+        <h1 class="text-xs font-semibold tracking-wider uppercase font-display text-neutral-200">
+          Descomposición &amp; Fragmentación Analítica
+        </h1>
+        <p class="text-[10px] text-neutral-500 font-mono-tech">Instalación Visual Interactiva</p>
+      </div>
+    </div>
+
+    <!-- Selector táctil de piezas (botones grandes y cómodos para tocar con los dedos) -->
+    <div class="flex items-center gap-2">
+      <div class="flex bg-neutral-900/90 p-1 rounded-lg border border-neutral-800 text-xs font-mono-tech" id="artwork-selector">
+        <button class="art-tab px-3 py-1.5 rounded-md font-semibold bg-white text-black transition-all" data-id="1">PIEZA 01</button>
+        <button class="art-tab px-3 py-1.5 rounded-md text-neutral-400 hover:text-white transition-all" data-id="2">PIEZA 02</button>
+        <button class="art-tab px-3 py-1.5 rounded-md text-neutral-400 hover:text-white transition-all" data-id="3">PIEZA 03</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ÁREA PROTAGONISTA: LA FOTO DOMINA EL ESPACIO -->
+  <main class="flex-1 w-full flex items-center justify-center p-3 sm:p-6 lg:p-8 relative">
+    
+    <!-- Contenedor central a proporción exacta 16:9 que se expande al máximo sin deformarse -->
+    <div class="relative w-full max-w-[1200px] aspect-[16/9] bg-neutral-950 rounded-xl overflow-hidden shadow-[0_25px_60px_-15px_rgba(0,0,0,0.9)] border border-neutral-800/80 cursor-pointer" id="touch-canvas">
+      
+      <!-- 1. CAPA NÍTIDA BASE (Foto original limpia) -->
+      <img id="base-layer" 
+           src="img/Foto sola.png" 
+           alt="Toma original pura" 
+           class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-transform duration-700 ease-out">
+
+      <!-- 2. CAPA FRAGMENTADA / MOSAICO (Tu edición) -->
+      <img id="fragmented-layer" 
+           src="img/Fragmentada.png" 
+           alt="Composición fragmentada con recortes" 
+           class="absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-opacity duration-500 ease-out opacity-0 z-10">
+
+      <!-- 3. OVERLAY VECTORIAL DECORATIVO CON CAJAS, MANIJAS Y ETIQUETAS TIPO BRIK SPACE -->
+      <div id="graphic-overlay" class="absolute inset-0 z-20 pointer-events-none">
+        <!-- Generado dinámicamente con las coordenadas de tus recortes -->
+      </div>
+
+      <!-- 4. PASTILLA FLOTANTE TÁCTIL (Pill indicador para el usuario) -->
+      <div id="touch-indicator" class="absolute bottom-5 left-1/2 -translate-x-1/2 z-30 bg-black/85 backdrop-blur-md text-white text-xs px-5 py-2.5 rounded-full font-mono-tech tracking-wider border border-white/20 shadow-2xl flex items-center gap-2.5 pointer-events-none transition-all duration-300">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <span id="indicator-text">TOCÁ LA PANTALLA PARA REVELAR COMPOSICIÓN</span>
+      </div>
+
+      <!-- Guías sutiles en las esquinas estilo encuadre de cámara / galería técnica -->
+      <div class="absolute top-3 left-3 w-4 h-4 border-t-2 border-l-2 border-white/30 pointer-events-none z-30"></div>
+      <div class="absolute top-3 right-3 w-4 h-4 border-t-2 border-r-2 border-white/30 pointer-events-none z-30"></div>
+      <div class="absolute bottom-3 left-3 w-4 h-4 border-b-2 border-l-2 border-white/30 pointer-events-none z-30"></div>
+      <div class="absolute bottom-3 right-3 w-4 h-4 border-b-2 border-r-2 border-white/30 pointer-events-none z-30"></div>
+
+    </div>
+
+  </main>
+
+  <!-- BARRA INFERIOR DE ESTADO TÁCTIL (Touch Friendly) -->
+  <footer class="w-full px-6 py-3 border-t border-neutral-900 bg-[#09090b] flex flex-wrap items-center justify-between gap-3 text-xs font-mono-tech text-neutral-400 z-40">
+    <div class="flex items-center gap-3">
+      <span class="inline-block w-2 h-2 rounded-full bg-emerald-500" id="status-dot"></span>
+      <span id="status-label" class="text-neutral-300 font-medium">ESTADO: ORIGINAL NÍTIDO</span>
+    </div>
+
+    <!-- Botón táctil grande alternativo para la mano del usuario -->
+    <button id="direct-action-btn" class="px-5 py-2 bg-neutral-100 active:bg-neutral-300 text-black font-semibold rounded-lg shadow-sm text-xs tracking-wider uppercase transition-colors">
+      Alternar Vista
+    </button>
+  </footer>
+
+  <script>
+    // Configuración de las piezas de la serie
+    const galleryData = {
+      1: {
+        title: "Pieza 01 — Desplazamiento & Fragmentación",
+        base: "img/Foto sola.png",
+        fragmented: "img/Fragmentada.png",
+        boxes: [
+          { x: 10, y: 12, w: 22, h: 22, tag: "01", label: "MONO-THRESHOLD" },
+          { x: 18, y: 30, w: 20, h: 28, tag: "02", label: "RGB-SPLIT" },
+          { x: 44, y: 10, w: 18, h: 24, tag: "03", label: "TEXT-DECON" },
+          { x: 38, y: 34, w: 24, h: 32, tag: "04", label: "RED-CORE" },
+          { x: 68, y: 8,  w: 14, h: 24, tag: "05", label: "SPECTRUM" },
+          { x: 59, y: 34, w: 14, h: 22, tag: "06", label: "OFFSET" },
+          { x: 71, y: 44, w: 16, h: 22, tag: "07", label: "CHROMA" },
+          { x: 28, y: 66, w: 16, h: 22, tag: "08", label: "GRADIENT" },
+          { x: 54, y: 67, w: 17, h: 26, tag: "09", label: "TEXTURE" },
+          { x: 80, y: 15, w: 12, h: 26, tag: "10", label: "THRESHOLD" }
+        ]
+      },
+      2: {
+        title: "Pieza 02 — Exploración Modular",
+        base: "img/compo2sol.png",
+        fragmented: "img/compo2fra.png",
+        boxes: [
+          { x: 15, y: 20, w: 25, h: 30, tag: "01", label: "CROP-A" },
+          { x: 45, y: 25, w: 28, h: 35, tag: "02", label: "CROP-B" },
+          { x: 60, y: 55, w: 22, h: 28, tag: "03", label: "CROP-C" }
+        ]
+      },
+      3: {
+        title: "Pieza 03 — Síntesis Visual",
+        base: "img/compo3sol.png",
+        fragmented: "img/compo3fra.png",
+        boxes: [
+          { x: 20, y: 15, w: 30, h: 40, tag: "01", label: "EXP-01" },
+          { x: 55, y: 35, w: 30, h: 35, tag: "02", label: "EXP-02" }
+        ]
+      }
+    };
+
+    let currentId = 1;
+    let isRevealed = false;
+
+    // Referencias al DOM
+    const canvas = document.getElementById('touch-canvas');
+    const baseLayer = document.getElementById('base-layer');
+    const fragmentedLayer = document.getElementById('fragmented-layer');
+    const graphicOverlay = document.getElementById('graphic-overlay');
+    const touchIndicator = document.getElementById('touch-indicator');
+    const indicatorText = document.getElementById('indicator-text');
+    const statusDot = document.getElementById('status-dot');
+    const statusLabel = document.getElementById('status-label');
+    const directActionBtn = document.getElementById('direct-action-btn');
+    const artTabs = document.querySelectorAll('.art-tab');
+
+    // Manejo de fallback procedural automático si las imágenes locales no cargan
+    function createFallbackCanvas(text, isFragmented) {
+      const c = document.createElement('canvas');
+      c.width = 1600;
+      c.height = 900;
+      const ctx = c.getContext('2d');
+
+      // Fondo neutro / luz cenital
+      ctx.fillStyle = '#c5c2bc';
+      ctx.fillRect(0, 0, 1600, 900);
+
+      // Círculo rojo central
+      ctx.beginPath();
+      ctx.arc(800, 450, 220, 0, Math.PI * 2);
+      ctx.fillStyle = '#dc2626';
+      ctx.fill();
+
+      // Silueta gotero y botella
+      ctx.fillStyle = '#1c1917';
+      ctx.fillRect(720, 180, 50, 190);
+      ctx.fillRect(660, 480, 280, 180);
+
+      if (isFragmented) {
+        ctx.fillStyle = '#991b1b';
+        ctx.font = 'bold 48px monospace';
+        ctx.fillText('FRAGMENTOS ANALÍTICOS (DEMO)', 480, 460);
+      }
+      return c.toDataURL('image/jpeg');
+    }
+
+    baseLayer.onerror = () => { baseLayer.src = createFallbackCanvas("BASE", false); };
+    fragmentedLayer.onerror = () => { fragmentedLayer.src = createFallbackCanvas("FRAGMENTADA", true); };
+
+    // Construir recuadros, etiquetas y manijas vectoriales estilo Brik Space
+    function buildGraphicOverlay(boxes) {
+      graphicOverlay.innerHTML = '';
+      const positions = ['-top-1 -left-1', '-top-1 -right-1', '-bottom-1 -left-1', '-bottom-1 -right-1'];
+
+      boxes.forEach((box, i) => {
+        const boxEl = document.createElement('div');
+        boxEl.className = 'reveal-block absolute border border-white/70 shadow-sm opacity-0 scale-95 pointer-events-none';
+        boxEl.style.left = `${box.x}%`;
+        boxEl.style.top = `${box.y}%`;
+        boxEl.style.width = `${box.w}%`;
+        boxEl.style.height = `${box.h}%`;
+        boxEl.setAttribute('data-index', i);
+
+        // Manijas en las 4 esquinas
+        positions.forEach(pos => {
+          const handle = document.createElement('div');
+          handle.className = `handle-dot ${pos}`;
+          boxEl.appendChild(handle);
+        });
+
+        // Etiqueta tipográfica monospace
+        const label = document.createElement('div');
+        label.className = 'absolute -top-4 left-0 text-[8px] font-mono-tech tracking-widest text-black bg-white/95 px-1 py-0.2 border border-black uppercase font-bold flex items-center gap-1';
+        label.innerHTML = `<span>${box.label}</span><span class="text-neutral-500">[${box.tag}]</span>`;
+        boxEl.appendChild(label);
+
+        graphicOverlay.appendChild(boxEl);
+      });
+    }
+
+    // Alternar estado (Touch Toggle puro)
+    function toggleState(e) {
+      isRevealed = !isRevealed;
+
+      // Efecto visual táctil (Ripple) en el punto exacto donde el dedo tocó la pantalla
+      if (e && (e.clientX || (e.touches && e.touches[0]))) {
+        createTouchRipple(e);
+      }
+
+      const blocks = graphicOverlay.querySelectorAll('.reveal-block');
+
+      if (isRevealed) {
+        // Revelar capa fragmentada
+        fragmentedLayer.style.opacity = '1';
+        baseLayer.style.transform = 'scale(1.015)';
+
+        // Animar recuadros técnicos secuencialmente
+        blocks.forEach((el, index) => {
+          setTimeout(() => {
+            el.classList.remove('opacity-0', 'scale-95');
+            el.classList.add('opacity-100', 'scale-100');
+          }, index * 25);
+        });
+
+        // Actualizar UI táctil
+        indicatorText.textContent = "TOCÁ DE NUEVO PARA VOLVER A LA TOMA NÍTIDA";
+        statusDot.className = "inline-block w-2 h-2 rounded-full bg-rose-500 animate-pulse";
+        statusLabel.textContent = "ESTADO: COMPOSICIÓN FRAGMENTADA";
+        statusLabel.className = "text-rose-400 font-medium";
+        directActionBtn.textContent = "Ver Nítido";
+      } else {
+        // Volver a estado nítido
+        fragmentedLayer.style.opacity = '0';
+        baseLayer.style.transform = 'scale(1)';
+
+        blocks.forEach(el => {
+          el.classList.add('opacity-0', 'scale-95');
+          el.classList.remove('opacity-100', 'scale-100');
+        });
+
+        indicatorText.textContent = "TOCÁ LA PANTALLA PARA REVELAR COMPOSICIÓN";
+        statusDot.className = "inline-block w-2 h-2 rounded-full bg-emerald-500";
+        statusLabel.textContent = "ESTADO: ORIGINAL NÍTIDO";
+        statusLabel.className = "text-neutral-300 font-medium";
+        directActionBtn.textContent = "Revelar Compo";
+      }
+    }
+
+    // Ripple effect táctil
+    function createTouchRipple(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : rect.left + rect.width / 2);
+      const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : rect.top + rect.height / 2);
+
+      const circle = document.createElement('div');
+      const diameter = Math.max(rect.width, rect.height) * 0.25;
+      const radius = diameter / 2;
+
+      circle.style.width = circle.style.height = `${diameter}px`;
+      circle.style.left = `${clientX - rect.left - radius}px`;
+      circle.style.top = `${clientY - rect.top - radius}px`;
+      circle.classList.add('touch-ripple');
+
+      const existing = canvas.querySelector('.touch-ripple');
+      if (existing) existing.remove();
+
+      canvas.appendChild(circle);
+      setTimeout(() => circle.remove(), 600);
+    }
+
+    // Cargar pieza seleccionada
+    function loadArtwork(id) {
+      currentId = id;
+      const data = galleryData[id];
+      if (!data) return;
+
+      // Reseteo de estado a nítido
+      if (isRevealed) toggleState();
+
+      baseLayer.src = data.base;
+      fragmentedLayer.src = data.fragmented;
+      buildGraphicOverlay(data.boxes);
+
+      // Actualizar pestañas activas
+      artTabs.forEach(tab => {
+        if (parseInt(tab.dataset.id) === id) {
+          tab.className = "art-tab px-3 py-1.5 rounded-md font-semibold bg-white text-black transition-all";
+        } else {
+          tab.className = "art-tab px-3 py-1.5 rounded-md text-neutral-400 hover:text-white transition-all";
+        }
+      });
+    }
+
+    // EVENTOS TÁCTILES PUROS
+    // Disparo inmediato por 'pointerup' o 'click' (sin delay de 300ms en iOS/Android)
+    canvas.addEventListener('pointerup', (e) => {
+      e.preventDefault();
+      toggleState(e);
+    });
+
+    directActionBtn.addEventListener('pointerup', (e) => {
+      e.preventDefault();
+      toggleState(e);
+    });
+
+    // Pestañas táctiles
+    artTabs.forEach(tab => {
+      tab.addEventListener('pointerup', (e) => {
+        e.preventDefault();
+        loadArtwork(parseInt(tab.dataset.id));
+      });
+    });
+
+    // Inicializar primera pieza
+    loadArtwork(1);
+  </script>
+</body>
+</html>
